@@ -1,6 +1,7 @@
 package fpoly.huynkph38086.applab1;
 
 import android.os.Bundle;
+import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +9,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.List;
+
+import fpoly.huynkph38086.applab1.adapter.ListCitiesAdapter;
+import fpoly.huynkph38086.applab1.model.City;
+import fpoly.huynkph38086.applab1.services.FirebaseServices;
+
 public class Main extends AppCompatActivity {
+    ListView lv;
+    //LottieAnimationView lav;
+    List<City> cities;
+    ListCitiesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +32,16 @@ public class Main extends AppCompatActivity {
             return insets;
         });
 
-        findViewById(R.id.btn_logout).setOnClickListener(v -> new FirebaseServices(this).signOut());
+        lv = findViewById(R.id.lv);
+        //lav = findViewById(R.id.lav);
+
+        FirebaseServices services = new FirebaseServices(this);
+        cities = services.getCities();
+
+        adapter = new ListCitiesAdapter(this, cities);
+        lv.setAdapter(adapter);
+
+        //lav.setOnClickListener(v -> services.signOut());
+        findViewById(R.id.btn_logout).setOnClickListener(v -> services.signOut());
     }
 }

@@ -1,6 +1,5 @@
 package fpoly.huynkph38086.applab1;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -14,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import fpoly.huynkph38086.applab1.services.FirebaseServices;
 
 public class Login extends AppCompatActivity {
     EditText edMail, edPass;
@@ -59,5 +60,7 @@ public class Login extends AppCompatActivity {
         tvSignUp.setOnClickListener(v -> startActivity(new Intent(this, SignUp.class)));
 
         ibPhone.setOnClickListener(v -> startActivity(new Intent(this, SignInWithPhone.class)));
+
+        findViewById(R.id.btn_tester).setOnClickListener(v -> startActivity(new Intent(this, Main.class)));
     }
 }
