@@ -97,7 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:background="@drawable/bg_green_corner8"
+            android:background="@drawable/bg_green"
             android:padding="2dp"
             android:src="@drawable/ic_white_phone_48"
             tools:ignore="SpeakableTextPresentCheck" />

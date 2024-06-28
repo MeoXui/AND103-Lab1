@@ -19,11 +19,13 @@ import fpoly.huynkph38086.applab1.model.City;
 public class ListCitiesAdapter extends ArrayAdapter<City> {
     Context mContext;
     int itemLayout;
+    UaD uad;
 
-    public ListCitiesAdapter(@NonNull Context context, @NonNull List<City> list) {
+    public ListCitiesAdapter(@NonNull Context context, @NonNull List<City> list, UaD uad) {
         super(context, R.layout.item_city, list);
         mContext = context;
         itemLayout = R.layout.item_city;
+        this.uad = uad;
     }
 
     @NonNull
@@ -44,12 +46,18 @@ public class ListCitiesAdapter extends ArrayAdapter<City> {
 
         if (item != null) {
             tvID.setText(item._id);
-            tvName.setText("Name: " + item._name);
+            tvName.setText("Name: " + item.name);
             tvState.setText("State: " + item.state);
             tvCountry.setText("Country: " + item.country);
             tvCapital.setText("Capital: " + (item.capital ? "yes" : "no"));
             tvPopulation.setText("Population: " + item.population);
             //tvRegions.setText("Regions: " + item.regions.toString());
+
+            view.setOnClickListener(v -> uad.update(item));
+            view.setOnLongClickListener(v -> {
+                uad.delete(item._id);
+                return true;
+            });
         } else Toast.makeText(mContext, "null data", Toast.LENGTH_SHORT).show();
 
         return view;

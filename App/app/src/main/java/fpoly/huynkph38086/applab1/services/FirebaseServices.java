@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import fpoly.huynkph38086.applab1.Main;
@@ -38,13 +36,14 @@ public class FirebaseServices {
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     String mVerificationId;
 
-    FirebaseFirestore db;
+    FirebaseFirestore firestore;
     List<City> cities;
 
     public FirebaseServices(Activity activity) {
         mActivity = activity;
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+        firestore = FirebaseFirestore.getInstance();
+        cities = new ArrayList<>();
     }
 
     public void getCurrentUser() {
@@ -68,17 +67,6 @@ public class FirebaseServices {
                 mVerificationId = s;
             }
         };
-    }
-
-    public List<City> getCities() {
-        cities = new ArrayList<>();
-        readCitiesData();
-        if (cities.isEmpty()) {
-            writeSampleCitiesData();
-            readCitiesData();
-        }
-        Toast.makeText(mActivity, "data count: " + cities.size(), Toast.LENGTH_SHORT).show();
-        return cities;
     }
 
     public void signUp(String email, String password) {
@@ -135,7 +123,7 @@ public class FirebaseServices {
     }
 
     public void writeSampleCitiesData() {
-        CollectionReference cities = db.collection("cities");
+        CollectionReference cities = firestore.collection("cities");
 
         Map<String, Object> data1 = new HashMap<>();
         data1.put("name", "San Francisco");
@@ -157,7 +145,7 @@ public class FirebaseServices {
 
         Map<String, Object> data3 = new HashMap<>();
         data3.put("name", "Washington D.C.");
-        data3.put("state", null);
+        data3.put("state", "null");
         data3.put("country", "USA");
         data3.put("capital", true);
         data3.put("population", 680000);
@@ -166,7 +154,7 @@ public class FirebaseServices {
 
         Map<String, Object> data4 = new HashMap<>();
         data4.put("name", "Tokyo");
-        data4.put("state", null);
+        data4.put("state", "null");
         data4.put("country", "Japan");
         data4.put("capital", true);
         data4.put("population", 9000000);
@@ -175,7 +163,7 @@ public class FirebaseServices {
 
         Map<String, Object> data5 = new HashMap<>();
         data5.put("name", "Beijing");
-        data5.put("state", null);
+        data5.put("state", "null");
         data5.put("country", "China");
         data5.put("capital", true);
         data5.put("population", 21500000);
@@ -184,10 +172,10 @@ public class FirebaseServices {
     }
 
     public void writeCitiesData(City city){
-        CollectionReference cities = db.collection("cities");
+        CollectionReference cities = firestore.collection("cities");
 
         Map<String, Object> data = new HashMap<>();
-        data.put("name", city._name);
+        data.put("name", city.name);
         data.put("state", city.state);
         data.put("country", city.country);
         data.put("capital", city.capital);
@@ -197,27 +185,24 @@ public class FirebaseServices {
         cities.document(city._id).set(data);
     }
 
-    public void readCitiesData() {
-        db.collection("cities").get().addOnCompleteListener(task -> {
+    public List<City> readCitiesData() {
+        cities.clear();
+        firestore.collection("cities").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    String id = document.getId();
-                    Map<String, Object> data = document.getData();
-                    City item = new City(
-                            id,
-                            data.get("name").toString(),
-                            "null",
-                            data.get("country").toString(),
-                            Boolean.parseBoolean(data.get("capital").toString()),
-                            Long.parseLong(data.get("population").toString())//,
-                            //(Arrays) data.get("regions")
-                    );
-                    cities.add(item);
-                    Log.d("List", id + " => " + data);
+                    City item = document.toObject(City.class);
+                    item._id = document.getId();
+                    this.cities.add(item);
                 }
             } else {
                 Log.d("List", "Error getting documents: ", task.getException());
             }
         });
+        return cities;
+    }
+
+    public void deleteCity(String id) {
+        CollectionReference cities = firestore.collection("cities");
+        cities.document(id).delete();
     }
 }
